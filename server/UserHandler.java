@@ -1,24 +1,26 @@
 
+package server;
+
 import java.net.*;
 import java.io.*;
 import java.util.*;
 
 class UserHandler {
 	
-	HashMap<String, Socket> users;
+	HashMap<String, User> users;
 
 	public UserHandler() {
-		users = new HashMap<String, Socket>();
+		users = new HashMap<String, User>();
 	}
 
-	public synchronized boolean addUser(String username, Socket connection) {
+	public synchronized boolean addUser(String username) {
 		if (users.containsKey(username)) return false;
 		
-		users.put(username, connection);
+		users.put(username, new User(username));
 		return true;
 	}
 
-	public synchronized Socket getUser(String username) {
+	public synchronized User getUser(String username) {
 		return users.get(username);
 	}
 }

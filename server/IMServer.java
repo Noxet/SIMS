@@ -1,8 +1,13 @@
+
+package server;
+
 import java.net.*;
 import java.io.*;
 import java.util.*;
 
-class IMServer extends Thread {
+import common.Protocol;
+
+public class IMServer extends Thread {
 	
 	private static final int PORT = 1337;
 
@@ -53,20 +58,23 @@ class IMHandler extends Thread {
 
 			String username = in.readLine();
 			System.out.println("Username: " + username);
-			userHandler.addUser(username, connection);
+			userHandler.addUser(username);
+			OutputThread ot = new OutputThread(userHandler.getUser(username), out, connection);
+			ot.start();
 			
 			String friend;
 			String msg;
 			BufferedWriter outfriend;
-			Socket sfriend;
+			User sfriend;
 			while (true) {
 				friend = in.readLine();
 				msg = in.readLine();
 				sfriend = userHandler.getUser(friend);
-				outfriend = new BufferedWriter(new OutputStreamWriter(sfriend.getOutputStream()));
+				sfriend.sendMessage(msg);
+				//outfriend = new BufferedWriter(new OutputStreamWriter(sfriend.getOutputStream()));
 				
-				outfriend.write(msg + "\n");
-				outfriend.flush();
+				//outfriend.write(msg + "\n");
+				//outfriend.flush();
 				//OutputThread ot = new OutputThread(out, sin);
 				//ot.start();
 			}
@@ -75,6 +83,10 @@ class IMHandler extends Thread {
 			//OutputThread ot = new OutputThread(out, uh);
 
 		} catch (IOException e) {
+			try {
+				connection.close();
+			} catch (IOException ie) {}
+
 			System.err.println(e);
 		}
 	}
