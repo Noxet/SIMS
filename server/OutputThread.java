@@ -20,16 +20,19 @@ class OutputThread extends Thread {
 
 	@Override
 	public void run() {
-		while (!socket.isClosed() && !socket.isOutputShutdown()) {
-			try {
+		try {
+			while (!socket.isClosed() && !socket.isOutputShutdown()) {
 				if (user.incomingMessage() && !socket.isClosed()) {
 					out.write(user.getMessage() + "\n");
 					out.flush();
 				}
-			} catch (IOException e) {
-				System.err.println("OThread<" + user.getUsername() + ">: " + e);
-				break; // TEST
 			}
+		} catch (IOException e) {
+			System.err.println("OThread<" + user.getUsername() + ">: " + e);
+		} finally {
+			try {
+				out.close();
+			} catch (Exception ex) {}
 		}
 	}
 }
